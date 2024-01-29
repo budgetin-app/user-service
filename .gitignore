@@ -1,0 +1,2 @@
+.env
+./config/wire_gen.go

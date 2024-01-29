@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+option go_package = "github.com/Budgetin-Project/user-service/app/proto/userservice";
+
+package userservice;
+
+// The user service definition
+service User {
+    rpc RegisterUser (AuthenticationRequest) returns (RegisterResponse);
+    rpc LoginUser (AuthenticationRequest) returns (LoginResponse);
+    rpc LogoutUser (LogoutRequest) returns (LogoutResponse);
+    rpc VerifyEmailAddress (VerifyEmailRequest) returns (VerifyEmailResponse);
+}
+
+// The request message for authentication purpose (login & register),
+// contains user's username, email, and password
+message AuthenticationRequest {
+    string username = 1;
+    string email = 2;
+    string password = 3;
+}
+
+// The response message for register user contains the user's id
+message RegisterResponse {
+    uint32 user_id = 1;
+}
+
+// The response message for login user contains the user's authentication token
+message LoginResponse {
+    string auth_token = 1;
+}
+
+// The request message for logout user contains the user's authentication token
+message LogoutRequest {
+    string auth_token = 1;
+}
+
+// The response message for logout user contains the status of the logout action
+message LogoutResponse {
+    bool success = 1;
+}
+
+// The request message for verifying the user's email address
+message VerifyEmailRequest {
+    string email = 1;
+}
+
+// The response message for verifying the user's email address,
+// contains the status of the logout action
+message VerifyEmailResponse {
+    bool verified = 1;
+}
