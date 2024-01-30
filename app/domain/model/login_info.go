@@ -1,5 +1,11 @@
 package model
 
+import (
+	"errors"
+
+	"gorm.io/gorm"
+)
+
 type LoginInfo struct {
 	ID                  uint   `gorm:"column:user_id; primaryKey"`
 	Username            string `gorm:"size:20; unique"`
@@ -17,4 +23,13 @@ type LoginInfo struct {
 
 func (LoginInfo) TableName() string {
 	return "user_login_info"
+}
+
+func (i LoginInfo) BeforeUpdate(tx *gorm.DB) error {
+	// Username should not be changed at any circumstances, because it will be
+	// used in the password hashing process
+	if tx.Statement.Changed("Username") {
+		return errors.New("username not allowed to be changed")
+	}
+	return nil
 }
