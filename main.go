@@ -5,11 +5,20 @@ import (
 	"log"
 	"net"
 
+	"github.com/Budgetin-Project/user-management-service/config/database"
 	"github.com/Budgetin-Project/user-service/app/pkg/helper/env"
 	"github.com/Budgetin-Project/user-service/app/server"
+	"github.com/joho/godotenv"
 )
 
+func init() {
+	godotenv.Load()
+}
+
 func main() {
+	// TODO: Remove this later, only used to check the db migration
+	database.ConnectDB()
+
 	// Listener for incoming TCP connections on the specified ports
 	port := env.GetenvOrDefault("SERVER_PORT", "50051")
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
