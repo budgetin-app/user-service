@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/Budgetin-Project/user-management-service/config/database"
+	"github.com/Budgetin-Project/user-management-service/config"
 	"github.com/Budgetin-Project/user-service/app/pkg/helper/env"
 	"github.com/Budgetin-Project/user-service/app/server"
 	"github.com/joho/godotenv"
@@ -16,8 +16,11 @@ func init() {
 }
 
 func main() {
-	// TODO: Remove this later, only used to check the db migration
-	database.ConnectDB()
+	// Initialize the configuration for dependency injection
+	cfg := config.Configure()
+
+	// Initialize grpc server
+	server := server.InitServer(cfg)
 
 	// Listener for incoming TCP connections on the specified ports
 	port := env.GetenvOrDefault("SERVER_PORT", "50051")
@@ -25,9 +28,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-
-	// Initialize grpc server
-	server := server.InitServer()
 
 	// Log the server address where it's listening
 	log.Printf("server listening at %v", listen.Addr())

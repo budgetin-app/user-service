@@ -1,5 +1,15 @@
 package config
 
+import "github.com/Budgetin-Project/user-service/app/controller"
+
 type Configuration struct {
-	// TODO: Add repository and controller her
+	AuthController controller.AuthController
+}
+
+func NewConfiguration(
+	authController controller.AuthController,
+) *Configuration {
+	return &Configuration{
+		AuthController: authController,
+	}
 }

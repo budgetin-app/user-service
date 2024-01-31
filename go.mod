@@ -5,6 +5,14 @@ go 1.21.1
 require google.golang.org/grpc v1.61.0
 
 require (
+	github.com/google/subcommands v1.0.1 // indirect
+	github.com/google/wire v0.5.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	golang.org/x/mod v0.8.0 // indirect
+	golang.org/x/tools v0.6.0 // indirect
+)
+
+require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
