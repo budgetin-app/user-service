@@ -25,7 +25,22 @@ func (LoginInfo) TableName() string {
 	return "user_login_info"
 }
 
-func (i LoginInfo) BeforeUpdate(tx *gorm.DB) error {
+func (i *LoginInfo) BeforeCreate(tx *gorm.DB) (err error) {
+	// Checking username or email is already registered
+	var info LoginInfo
+	if res := tx.Where("username = ?", i.Username).Or("email = ?", i.Email).Find(&info); res.RowsAffected > 0 {
+		if i.Username == info.Username {
+			return errors.New("username already registered")
+		}
+		if i.Email == info.Email {
+			return errors.New("email already registered")
+		}
+
+	}
+	return nil
+}
+
+func (i *LoginInfo) BeforeUpdate(tx *gorm.DB) (err error) {
 	// Username should not be changed at any circumstances, because it will be
 	// used in the password hashing process
 	if tx.Statement.Changed("Username") {
