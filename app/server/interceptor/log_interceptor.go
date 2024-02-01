@@ -2,9 +2,9 @@ package interceptor
 
 import (
 	"context"
-	"log"
 	"os"
 
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
@@ -21,7 +21,7 @@ func LoggingInterceptor(
 
 	// Log incoming request if LOG_LEVEL is set to DEBUG
 	if logLevel == "DEBUG" {
-		log.Printf("[LOG] gRPC method: %s, request: %v", info.FullMethod, req)
+		log.WithFields(log.Fields{"method": info.FullMethod}).Infof("Request -> %v", req)
 	}
 
 	// Call the actual handler to process the request
@@ -29,8 +29,11 @@ func LoggingInterceptor(
 
 	// Log outgoing response if LOG_LEVEL is set to DEBUG
 	if logLevel == "DEBUG" {
-		log.Printf("[LOG] gRPC method: %s, response: %v", info.FullMethod, resp)
+		if err != nil {
+			log.WithFields(log.Fields{"method": info.FullMethod}).Errorf("Response -> %v", resp)
+		} else {
+			log.WithFields(log.Fields{"method": info.FullMethod}).Infof("Response -> %v", resp)
+		}
 	}
-
 	return resp, err
 }

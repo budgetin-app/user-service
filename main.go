@@ -2,17 +2,22 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/Budgetin-Project/user-management-service/config"
 	"github.com/Budgetin-Project/user-service/app/pkg/helper/env"
+	"github.com/Budgetin-Project/user-service/app/pkg/logger"
 	"github.com/Budgetin-Project/user-service/app/server"
 	"github.com/joho/godotenv"
 )
 
 func init() {
 	godotenv.Load()
+
+	// Initialize logger
+	logger.InitLogger()
 }
 
 func main() {
@@ -26,14 +31,16 @@ func main() {
 	port := env.GetenvOrDefault("SERVER_PORT", "50051")
 	listen, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.WithFields(log.Fields{"port": port}).Fatal("Failed to listen")
 	}
 
 	// Log the server address where it's listening
-	log.Printf("server listening at %v", listen.Addr())
+	log.Infof("Server listening: %v", listen.Addr())
 
 	// Start serving incoming gRPC requests
 	if err := server.Serve(listen); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		log.WithFields(log.Fields{
+			"address": listen.Addr(),
+		}).Fatal("Server failed to serve")
 	}
 }
