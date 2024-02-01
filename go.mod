@@ -6,6 +6,7 @@ require google.golang.org/grpc v1.61.0
 
 require (
 	github.com/google/subcommands v1.0.1 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/google/wire v0.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/mod v0.8.0 // indirect

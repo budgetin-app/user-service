@@ -2,11 +2,11 @@ package server
 
 import (
 	"context"
-	"log"
 
 	"github.com/Budgetin-Project/user-service/app/controller"
 	"github.com/Budgetin-Project/user-service/app/pkg/validator"
 	pb "github.com/Budgetin-Project/user-service/app/proto/userservice"
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -33,13 +33,12 @@ func (s *UserServerImpl) RegisterUser(ctx context.Context, r *pb.AuthenticationR
 	}
 
 	// Begin to register new user
-	user, err := s.authController.Register(r.Username, r.Email, r.Password)
+	credential, err := s.authController.Register(r.Username, r.Email, r.Password)
 	if err != nil {
-		log.Fatalf("error register user: %v", err)
 		return nil, status.Errorf(codes.Internal, "failed to register user: %v", err)
 	}
 
-	return &pb.RegisterResponse{UserId: uint32(user.ID)}, nil
+	return &pb.RegisterResponse{UserId: *proto.Uint32(uint32(credential.ID))}, nil
 }
 
 func (s *UserServerImpl) LoginUser(ctx context.Context, r *pb.AuthenticationRequest) (*pb.LoginResponse, error) {
@@ -68,7 +67,6 @@ func (s *UserServerImpl) LoginUser(ctx context.Context, r *pb.AuthenticationRequ
 	// Begin to authenticate user
 	session, err := s.authController.Login(identifier, isEmail, r.Password)
 	if err != nil {
-		log.Fatalf("error login user: %v", err)
 		return nil, status.Errorf(codes.Internal, "failed to login user: %v", err)
 	}
 
@@ -84,7 +82,6 @@ func (s *UserServerImpl) LogoutUser(ctx context.Context, r *pb.LogoutRequest) (*
 	// Begin to logout the user
 	success, err := s.authController.Logout(r.AuthToken)
 	if err != nil {
-		log.Fatalf("error logout user: %v", err)
 		return nil, status.Errorf(codes.Internal, "failed to logout user: %v", err)
 	}
 
@@ -100,7 +97,6 @@ func (s *UserServerImpl) VerifyEmailAddress(ctx context.Context, r *pb.VerifyEma
 	// Begin to verify the email address
 	verified, err := s.authController.VerifyEmail(r.Email)
 	if err != nil {
-		log.Fatalf("error verify email: %v", err)
 		return nil, status.Errorf(codes.Internal, "failed to verify email: %v", err)
 	}
 
