@@ -3,12 +3,15 @@ package server
 import (
 	"github.com/Budgetin-Project/user-management-service/config"
 	pb "github.com/Budgetin-Project/user-service/app/proto/userservice"
+	"github.com/Budgetin-Project/user-service/app/server/interceptor"
 	"google.golang.org/grpc"
 )
 
 func InitServer(config *config.Configuration) *grpc.Server {
 	// Create a new gRPC server
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		grpc.UnaryInterceptor(interceptor.LoggingInterceptor),
+	)
 
 	// Register the "service implementation (gRPC server methods) with the gRPC server
 	pb.RegisterUserServer(server, NewUserServer(config.AuthController))
