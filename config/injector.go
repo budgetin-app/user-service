@@ -35,6 +35,11 @@ var sessionRepository = wire.NewSet(
 	wire.Bind(new(repository.SessionRepository), new(*repository.SessionRepositoryImpl)),
 )
 
+var emailVerificationRepository = wire.NewSet(
+	repository.NewEmailVerificationRepository,
+	wire.Bind(new(repository.EmailVerificationRepository), new(*repository.EmailVerificationRepositoryImpl)),
+)
+
 // Controllers
 var authController = wire.NewSet(
 	controller.NewAuthController,
@@ -50,6 +55,7 @@ func Configure() *Configuration {
 		loginInfoRepository,
 		roleRepository,
 		sessionRepository,
+		emailVerificationRepository,
 		authController,
 	)
 	return nil

@@ -22,10 +22,11 @@ type AuthController interface {
 }
 
 type AuthControllerImpl struct {
-	accountRepository   repository.AccountRepository
-	loginInfoRepository repository.LoginInfoRepository
-	roleRepository      repository.RoleRepository
-	sessionRepository   repository.SessionRepository
+	accountRepository           repository.AccountRepository
+	loginInfoRepository         repository.LoginInfoRepository
+	roleRepository              repository.RoleRepository
+	sessionRepository           repository.SessionRepository
+	emailVerificationRepository repository.EmailVerificationRepository
 }
 
 func NewAuthController(
@@ -33,12 +34,14 @@ func NewAuthController(
 	loginInfoRepository repository.LoginInfoRepository,
 	roleRepository repository.RoleRepository,
 	sessionRepository repository.SessionRepository,
+	emailVerificationRepository repository.EmailVerificationRepository,
 ) *AuthControllerImpl {
 	return &AuthControllerImpl{
-		accountRepository:   accountRepository,
-		loginInfoRepository: loginInfoRepository,
-		roleRepository:      roleRepository,
-		sessionRepository:   sessionRepository,
+		accountRepository:           accountRepository,
+		loginInfoRepository:         loginInfoRepository,
+		roleRepository:              roleRepository,
+		sessionRepository:           sessionRepository,
+		emailVerificationRepository: emailVerificationRepository,
 	}
 }
 
@@ -99,7 +102,9 @@ func (c AuthControllerImpl) Register(username string, email string, password str
 			// Log error
 			log.Errorf("error sending verification email: %v", err)
 		} else {
-			// TODO: Update the email verification status to 'sent'
+			// Update the email verification status to 'sent'
+			credential.EmailVerification.Status = model.VerificationSent
+			c.emailVerificationRepository.UpdateEmailVerification(&credential.EmailVerification)
 		}
 	}()
 
