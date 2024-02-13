@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px;">
+
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 10px;">
+        <h2 style="color: #333333;">Verify Your Email Address</h2>
+        <p>Dear {{.User}},</p>
+        <p>Thank you for signing up with {{.CompanyName}}! Before you can access your account, we need to verify your
+            email address to ensure the security of your account.</p>
+        <p style="text-align: center;">
+            <a href="{{.VerificationLink}}"
+                style="background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify
+                Email</a>
+        </p>
+        <p>Please note that this verification link is valid for a limited time period. If you do not verify your email within the next {{.Expiration}} hours, you may need to request a new verification email.</p>
+        <p>If the button above does not work, you can also verify your email address by copying and pasting the following link into your web browser:</p>
+        <a href="{{.VerificationLink}}">
+            <p>{{.VerificationLink}}</p>
+        </a>
+        <p>If you have any questions or need further assistance, feel free to reply to this email or contact our support
+            team at <a href="mailto:{{.SupportEmail}}">{{.SupportEmail}}</a>.</p>
+        <p>Thank you for choosing {{.CompanyName}}!</p>
+        <p>Best regards,<br>{{.CompanyName}}</p>
+    </div>
+
+</body>
+
+</html>

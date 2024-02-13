@@ -8,8 +8,10 @@ import (
 	"github.com/Budgetin-Project/user-service/app/constant"
 	"github.com/Budgetin-Project/user-service/app/domain/model"
 	"github.com/Budgetin-Project/user-service/app/pkg/hasher"
+	"github.com/Budgetin-Project/user-service/app/pkg/mailer"
 	"github.com/Budgetin-Project/user-service/app/repository"
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 type AuthController interface {
@@ -47,7 +49,7 @@ func (c AuthControllerImpl) Register(username string, email string, password str
 	passwordSalt := hasher.GenerateRandomSalt()
 	hashedPassword, err := hash.GenerateHashPassword([]byte(password), passwordSalt)
 	if err != nil {
-		return &model.LoginInfo{}, err
+		return nil, err
 	}
 
 	// TODO: Later the roleID should be retrieved from the request parameter
@@ -62,7 +64,7 @@ func (c AuthControllerImpl) Register(username string, email string, password str
 	// Store the user account
 	account, err := c.accountRepository.CreateAccount(&model.Account{RoleID: roleID})
 	if err != nil {
-		return &model.LoginInfo{}, err
+		return nil, err
 	}
 
 	// Store the user credentials with the created account
@@ -76,16 +78,30 @@ func (c AuthControllerImpl) Register(username string, email string, password str
 			Name: string(hashAlgorithm),
 		},
 		EmailVerification: model.EmailVerification{
-			Token: uuid.New().String(),
+			Token:  uuid.New().String(),
+			Status: model.VerificationPending,
 		},
 	})
 	if err != nil {
 		// Delete the account if error
 		c.accountRepository.DeleteAccount(&account)
-		return &model.LoginInfo{}, err
+		return nil, err
 	}
 
-	// TODO: Send verification email using event bus to trigger sending email verification asyncronously
+	// Send verification email using event bus to trigger sending email verification asyncronously
+	go func() {
+		if err := mailer.SendEmailVerification(
+			credential.Email,
+			credential.Username,
+			credential.EmailVerification.Token,
+			credential.EmailVerification.ExpiredAt,
+		); err != nil {
+			// Log error
+			log.Errorf("error sending verification email: %v", err)
+		} else {
+			// TODO: Update the email verification status to 'sent'
+		}
+	}()
 
 	return &credential, nil
 }
