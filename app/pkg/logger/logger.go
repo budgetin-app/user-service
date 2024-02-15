@@ -59,7 +59,7 @@ func getLevel() log.Level {
 	// according to the environment variable LOG_LEVEL
 	if os.Getenv("APP_DEBUGABLE") == "true" {
 		// Show all level
-		return log.InfoLevel
+		return log.DebugLevel
 	} else {
 		switch os.Getenv("LOG_LEVEL") {
 		case "DEBUG":
