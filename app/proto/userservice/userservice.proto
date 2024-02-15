@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/Budgetin-Project/user-service/app/proto/userservice";
+option go_package = "app/proto/userservice";
 
 package userservice;
 
@@ -43,6 +43,7 @@ message LogoutResponse {
 // The request message for verifying the user's email address
 message VerifyEmailRequest {
     string email = 1;
+    string verification_token = 2;
 }
 
 // The response message for verifying the user's email address,
