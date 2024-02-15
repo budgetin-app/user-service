@@ -5,7 +5,7 @@ import (
 
 	"github.com/Budgetin-Project/user-service/app/controller"
 	"github.com/Budgetin-Project/user-service/app/pkg/validator"
-	pb "github.com/Budgetin-Project/user-service/app/proto/userservice"
+	pb "github.com/Budgetin-Project/user-service/app/proto"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

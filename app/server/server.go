@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/Budgetin-Project/user-management-service/config"
-	pb "github.com/Budgetin-Project/user-service/app/proto/userservice"
+	pb "github.com/Budgetin-Project/user-service/app/proto"
 	"github.com/Budgetin-Project/user-service/app/server/interceptor"
 	"google.golang.org/grpc"
 )
