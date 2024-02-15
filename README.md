@@ -35,7 +35,7 @@ To generate Go files from .proto files, you need to install protoc-gen-go. You c
 1. **Compile the proto file**\
 The first step is to compile the `.proto` file using protoc. Navigate to the directory where the `.proto` file is located and execute the following command:
 	```bash
-	protoc --go_out=paths=source_relative:. -go-grpc_out=source_relative:. ./app/proto/*.proto
+	protoc --go_out=paths=source_relative:. --go-grpc_out=paths=source_relative:. ./app/proto/*.proto
 	```
 
 2. **Build the generated wire injection file**\
