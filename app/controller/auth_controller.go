@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"os"
+	"time"
 
 	"github.com/budgetin-app/user-service/app/constant"
 	"github.com/budgetin-app/user-service/app/domain/model"
@@ -91,22 +92,8 @@ func (c AuthControllerImpl) Register(username string, email string, password str
 		return nil, err
 	}
 
-	// Send verification email using event bus to trigger sending email verification asyncronously
-	go func() {
-		if err := mailer.SendEmailVerification(
-			credential.Email,
-			credential.Username,
-			credential.EmailVerification.Token,
-			credential.EmailVerification.ExpiredAt,
-		); err != nil {
-			// Log error
-			log.Errorf("error sending verification email: %v", err)
-		} else {
-			// Update the email verification status to 'sent'
-			credential.EmailVerification.Status = model.VerificationSent
-			c.emailVerificationRepository.UpdateEmailVerification(&credential.EmailVerification)
-		}
-	}()
+	// Send email verification email asyncronously
+	go c.sendVerificationEmail(&credential)
 
 	return &credential, nil
 }
@@ -122,8 +109,27 @@ func (c AuthControllerImpl) Logout(authToken string) (bool, error) {
 }
 
 func (c AuthControllerImpl) VerifyEmail(email string) (bool, error) {
-	// TODO: Not yet implemented
-	return false, errors.New("not yet implemented")
+	// Find the email verification status
+	credential, err := c.loginInfoRepository.FindLoginInfo(&model.LoginInfo{Email: email})
+	if err != nil {
+		log.WithError(err).Error("failed to find credential")
+		return false, err
+	}
+
+	// Return email verification status
+	verified := credential.EmailVerification.Status == model.EmailVerified
+
+	// Send an email verification request to the target user when not yet verified, only sent
+	// the email with a certain interval (minutes).
+	resendInterval := 15 // TODO: Move the interval into service configuration
+	if !verified && credential.EmailVerification.UpdatedAt.Add(time.Duration(resendInterval)*time.Minute).Before(time.Now()) {
+		log.Debug("Send email")
+		go c.sendVerificationEmail(&credential)
+	} else {
+		log.Debugf("Email already sent. Wait for %d minutes to resend", resendInterval)
+	}
+
+	return verified, nil
 }
 
 func getHashAlgorithm() hasher.HashAlgorithm {
@@ -136,4 +142,21 @@ func getHashAlgorithm() hasher.HashAlgorithm {
 	}
 
 	return algorithm
+}
+
+func (c *AuthControllerImpl) sendVerificationEmail(credential *model.LoginInfo) {
+	if err := mailer.SendEmailVerification(
+		credential.Email,
+		credential.Username,
+		credential.EmailVerification.Token,
+		credential.EmailVerification.ExpiredAt,
+	); err != nil {
+		// Log error
+		log.Errorf("error sending verification email: %v", err)
+	} else {
+		// Update the email verification status to 'sent'
+		credential.EmailVerification.ID = credential.EmailVerificationID
+		credential.EmailVerification.Status = model.VerificationSent
+		c.emailVerificationRepository.UpdateEmailVerification(&credential.EmailVerification)
+	}
 }
