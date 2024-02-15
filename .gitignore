@@ -2,3 +2,4 @@
 /logs/
 /config/wire_gen.go
 *.pb.go
+*.exe
