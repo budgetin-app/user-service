@@ -5,9 +5,9 @@
 package config
 
 import (
-	"github.com/Budgetin-Project/user-management-service/config/database"
-	"github.com/Budgetin-Project/user-service/app/controller"
-	"github.com/Budgetin-Project/user-service/app/repository"
+	"github.com/budgetin-app/user-management-service/config/database"
+	"github.com/budgetin-app/user-service/app/controller"
+	"github.com/budgetin-app/user-service/app/repository"
 	"github.com/google/wire"
 )
 

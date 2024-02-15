@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/Budgetin-Project/user-service/app/domain/model"
+	"github.com/budgetin-app/user-service/app/domain/model"
 	"gorm.io/gorm"
 )
 

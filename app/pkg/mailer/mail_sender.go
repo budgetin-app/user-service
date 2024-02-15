@@ -9,7 +9,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/Budgetin-Project/user-service/app/domain/model"
+	"github.com/budgetin-app/user-service/app/domain/model"
 	"gopkg.in/mail.v2"
 )
 

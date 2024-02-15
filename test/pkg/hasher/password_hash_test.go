@@ -3,7 +3,7 @@ package hasher_test
 import (
 	"testing"
 
-	"github.com/Budgetin-Project/user-service/app/pkg/hasher"
+	"github.com/budgetin-app/user-service/app/pkg/hasher"
 )
 
 func TestGenerateRandomSalt(t *testing.T) {

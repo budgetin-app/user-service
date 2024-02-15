@@ -1,6 +1,6 @@
 package config
 
-import "github.com/Budgetin-Project/user-service/app/controller"
+import "github.com/budgetin-app/user-service/app/controller"
 
 type Configuration struct {
 	AuthController controller.AuthController

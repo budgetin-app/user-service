@@ -5,11 +5,11 @@ import (
 	"errors"
 	"os"
 
-	"github.com/Budgetin-Project/user-service/app/constant"
-	"github.com/Budgetin-Project/user-service/app/domain/model"
-	"github.com/Budgetin-Project/user-service/app/pkg/hasher"
-	"github.com/Budgetin-Project/user-service/app/pkg/mailer"
-	"github.com/Budgetin-Project/user-service/app/repository"
+	"github.com/budgetin-app/user-service/app/constant"
+	"github.com/budgetin-app/user-service/app/domain/model"
+	"github.com/budgetin-app/user-service/app/pkg/hasher"
+	"github.com/budgetin-app/user-service/app/pkg/mailer"
+	"github.com/budgetin-app/user-service/app/repository"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )

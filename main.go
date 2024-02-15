@@ -6,10 +6,10 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/Budgetin-Project/user-management-service/config"
-	"github.com/Budgetin-Project/user-service/app/pkg/helper/env"
-	"github.com/Budgetin-Project/user-service/app/pkg/logger"
-	"github.com/Budgetin-Project/user-service/app/server"
+	"github.com/budgetin-app/user-management-service/config"
+	"github.com/budgetin-app/user-service/app/pkg/helper/env"
+	"github.com/budgetin-app/user-service/app/pkg/logger"
+	"github.com/budgetin-app/user-service/app/server"
 	"github.com/joho/godotenv"
 )
 

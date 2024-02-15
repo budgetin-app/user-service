@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/Budgetin-Project/user-management-service/config/database"
-	"github.com/Budgetin-Project/user-service/app/domain/model"
+	"github.com/budgetin-app/user-management-service/config/database"
+	"github.com/budgetin-app/user-service/app/domain/model"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )

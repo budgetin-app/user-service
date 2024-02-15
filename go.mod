@@ -1,4 +1,4 @@
-module github.com/Budgetin-Project/user-service
+module github.com/budgetin-app/user-service
 
 go 1.21.1
 
