@@ -21,10 +21,10 @@ Once Go is installed, follow these steps:
     cd user-service
     ```
 
-3. **Install Protocol Buffers Compiler (protoc)**:
+3. **Install Protocol Buffers Compiler (protoc)**:\
 You need to have Protocol Buffers Compiler installed. You can download it from the [Protocol Buffers GitHub releases page](https://github.com/protocolbuffers/protobuf/releases).
 
-4. **Install protoc-gen-go**:
+4. **Install protoc-gen-go**:\
 To generate Go files from .proto files, you need to install protoc-gen-go. You can do this using the following command:
     ```bash
     go install google.golang.org/protobuf/cmd/protoc-gen-go
@@ -32,19 +32,19 @@ To generate Go files from .proto files, you need to install protoc-gen-go. You c
 
 ## Compilation and Running
 
-1. **Compile the proto file**
+1. **Compile the proto file**\
 The first step is to compile the `.proto` file using protoc. Navigate to the directory where the `.proto` file is located and execute the following command:
 	```bash
 	protoc --go_out=paths=source_relative:. -go-grpc_out=source_relative:. ./app/proto/*.proto
 	```
 
-2. **Build the generated wire injection file**
+2. **Build the generated wire injection file**\
 After compiling the `.proto` file, you need to generate the wire injection file. Run the following command:
 	```bash
 	wire ./config
 	```
 
-3. **Build and run the application through `main.go` file**
+3. **Build and run the application through `main.go` file**\
 Finally, you can build and run the application using the `main.go` file. Execute the following commands:
 	```bash
 	go build -o main.exe ; ./main
