@@ -1,3 +1,4 @@
 .env
 /logs/
-config/wire_gen.go
+/config/wire_gen.go
+*.pb.go
