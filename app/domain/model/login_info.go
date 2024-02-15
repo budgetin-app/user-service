@@ -26,14 +26,14 @@ func (LoginInfo) TableName() string {
 }
 
 func (i *LoginInfo) BeforeCreate(tx *gorm.DB) (err error) {
-	// Checking username or email is already registered
+	// Checking username or email is already exists
 	var info LoginInfo
 	if res := tx.Where("username = ?", i.Username).Or("email = ?", i.Email).Find(&info); res.RowsAffected > 0 {
 		if i.Username == info.Username {
-			return errors.New("username already registered")
+			return errors.New("username already exists")
 		}
 		if i.Email == info.Email {
-			return errors.New("email already registered")
+			return errors.New("email already exists")
 		}
 
 	}
