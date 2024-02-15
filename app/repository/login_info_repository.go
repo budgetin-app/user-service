@@ -37,10 +37,11 @@ func (r LoginInfoRepositoryImpl) CreateLoginInfo(info *model.LoginInfo) (model.L
 }
 
 func (r LoginInfoRepositoryImpl) FindLoginInfo(info *model.LoginInfo) (model.LoginInfo, error) {
-	if err := r.db.Find(&info).Error; err != nil {
+	var loginInfo model.LoginInfo
+	if err := r.db.Preload("EmailVerification").Where(info).First(&loginInfo).Error; err != nil {
 		return model.LoginInfo{}, database.HandleErrorDB(err)
 	}
-	return *info, nil
+	return loginInfo, nil
 }
 
 func (r LoginInfoRepositoryImpl) UpdateLoginInfo(newInfo *model.LoginInfo) (model.LoginInfo, error) {
