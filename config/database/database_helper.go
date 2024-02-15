@@ -1,11 +1,12 @@
 package database
 
 import (
-	"errors"
 	"fmt"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func HandleErrorDB(err error) error {
-	fmt.Printf("database error: %v", err)
-	return errors.New("database error")
+	log.Errorf("database error: %v", err)
+	return fmt.Errorf("database error: %v", err)
 }
