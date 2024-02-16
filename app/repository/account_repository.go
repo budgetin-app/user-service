@@ -12,6 +12,7 @@ type AccountRepository interface {
 	FindAccountByUserID(userID uint) (model.Account, error)
 	UpdateAccount(newAccount *model.Account) (model.Account, error)
 	DeleteAccount(account *model.Account) (bool, error)
+	BeginTransaction() *gorm.DB
 }
 
 type AccountRepositoryImpl struct {
@@ -55,4 +56,8 @@ func (r AccountRepositoryImpl) DeleteAccount(account *model.Account) (bool, erro
 		return false, result.Error
 	}
 	return result.RowsAffected > 0, nil
+}
+
+func (r AccountRepositoryImpl) BeginTransaction() *gorm.DB {
+	return r.db.Begin()
 }

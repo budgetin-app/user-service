@@ -47,6 +47,17 @@ func NewAuthController(
 }
 
 func (c AuthControllerImpl) Register(username string, email string, password string) (*model.LoginInfo, error) {
+	// Begin a transaction
+	tx := c.accountRepository.BeginTransaction()
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	// Generate hashed password with random salt
 	hashAlgorithm := getHashAlgorithm()
 	hash := hasher.New(hashAlgorithm)
@@ -66,29 +77,32 @@ func (c AuthControllerImpl) Register(username string, email string, password str
 	roleID := constant.UserRoleID
 
 	// Store the user account
-	account, err := c.accountRepository.CreateAccount(&model.Account{RoleID: roleID})
-	if err != nil {
+	account := model.Account{RoleID: roleID}
+	if err := tx.Create(&account).Error; err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 
 	// Store the user credentials with the created account
-	credential, err := c.loginInfoRepository.CreateLoginInfo(&model.LoginInfo{
-		ID:           account.ID,
-		Username:     username,
-		Email:        email,
-		PasswordHash: string(hashedPassword),
-		PasswordSalt: hex.EncodeToString(passwordSalt),
-		HashAlgorithm: model.HashAlgorithm{
-			Name: string(hashAlgorithm),
-		},
+	credential := model.LoginInfo{
+		ID:            account.ID,
+		Username:      username,
+		Email:         email,
+		PasswordHash:  string(hashedPassword),
+		PasswordSalt:  hex.EncodeToString(passwordSalt),
+		HashAlgorithm: model.HashAlgorithm{Name: string(hashAlgorithm)},
 		EmailVerification: model.EmailVerification{
 			Token:  uuid.New().String(),
 			Status: model.VerificationPending,
 		},
-	})
-	if err != nil {
-		// Delete the account if error
-		c.accountRepository.DeleteAccount(&account)
+	}
+	if err := tx.Create(&credential).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// Commit the transaction if everything is successful
+	if err := tx.Commit().Error; err != nil {
 		return nil, err
 	}
 
