@@ -2,7 +2,8 @@ package repository
 
 import (
 	"errors"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/budgetin-app/user-service/app/domain/model"
 	"gorm.io/gorm"
@@ -25,7 +26,7 @@ func NewRoleRepository(db *gorm.DB) *RoleRepositoryImpl {
 
 func (r RoleRepositoryImpl) CreateRole(role *model.Role) (model.Role, error) {
 	if err := r.db.Create(&role).Error; err != nil {
-		log.Fatalf("error create new role: %v", err)
+		log.Errorf("error create new role: %v", err)
 		return model.Role{}, err
 	}
 	return *role, nil
@@ -43,7 +44,7 @@ func (r RoleRepositoryImpl) AssignRolePermissions(role *model.Role, permissions 
 
 	// Save the role with the updated permissions
 	if err := r.db.Save(&role).Error; err != nil {
-		log.Fatalf("error save role: %v", err)
+		log.Errorf("error save role: %v", err)
 		return err
 	}
 
@@ -53,7 +54,7 @@ func (r RoleRepositoryImpl) AssignRolePermissions(role *model.Role, permissions 
 func (r RoleRepositoryImpl) UpdateRole(newRole *model.Role) (model.Role, error) {
 	result := r.db.Model(&model.Role{ID: newRole.ID}).Updates(&newRole)
 	if result.Error != nil {
-		log.Fatalf("error update role: %v", result.Error)
+		log.Errorf("error update role: %v", result.Error)
 		return model.Role{}, result.Error
 	}
 	return *newRole, nil
@@ -61,7 +62,7 @@ func (r RoleRepositoryImpl) UpdateRole(newRole *model.Role) (model.Role, error) 
 func (r RoleRepositoryImpl) DeleteRole(role *model.Role) (bool, error) {
 	result := r.db.Delete(&role)
 	if result.Error != nil {
-		log.Fatalf("error delete role: %v", result.Error)
+		log.Errorf("error delete role: %v", result.Error)
 		return false, result.Error
 	}
 	return result.RowsAffected > 0, nil

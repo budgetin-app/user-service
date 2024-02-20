@@ -30,7 +30,7 @@ func (r SessionRepositoryImpl) CreateSession(userID uint, token string) (model.S
 		Token:  token,
 	}
 	if err := r.db.Create(&session).Error; err != nil {
-		log.Fatalf("error create new session: %v", err)
+		log.Errorf("error create new session: %v", err)
 		return model.Session{}, err
 	}
 	return *session, nil
@@ -51,7 +51,7 @@ func (r SessionRepositoryImpl) FindActiveSession(userID uint) (*model.Session, e
 func (r SessionRepositoryImpl) UpdateSessionStatus(sessionID uint, status string) (bool, error) {
 	result := r.db.Model(model.Session{ID: sessionID}).Update("status", status)
 	if result.Error != nil {
-		log.Fatalf("error finish session: %v", result.Error)
+		log.Errorf("error finish session: %v", result.Error)
 		return false, result.Error
 	}
 	return result.RowsAffected > 0, nil
@@ -60,7 +60,7 @@ func (r SessionRepositoryImpl) UpdateSessionStatus(sessionID uint, status string
 func (r SessionRepositoryImpl) DeleteSessionByToken(authToken string) error {
 	result := r.db.Where("session_token = ?", authToken).Delete(&model.Session{})
 	if result.Error != nil {
-		log.Fatalf("error delete session: %v", result.Error)
+		log.Errorf("error delete session: %v", result.Error)
 		return result.Error
 	}
 

@@ -1,9 +1,8 @@
 package repository
 
 import (
-	"log"
-
 	"github.com/budgetin-app/user-service/app/domain/model"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +24,7 @@ func NewAccountRepository(db *gorm.DB) *AccountRepositoryImpl {
 
 func (r AccountRepositoryImpl) CreateAccount(account *model.Account) (model.Account, error) {
 	if err := r.db.Create(&account).Error; err != nil {
-		log.Fatalf("error create new account: %v", err)
+		log.Errorf("error create new account: %v", err)
 		return model.Account{}, err
 	}
 	return *account, nil
@@ -34,7 +33,7 @@ func (r AccountRepositoryImpl) CreateAccount(account *model.Account) (model.Acco
 func (r AccountRepositoryImpl) FindAccountByUserID(userID uint) (model.Account, error) {
 	account := model.Account{ID: userID}
 	if err := r.db.Find(&account).Error; err != nil {
-		log.Fatalf("error find account by user id: %v", err)
+		log.Errorf("error find account by user id: %v", err)
 		return model.Account{}, err
 	}
 	return account, nil
@@ -43,7 +42,7 @@ func (r AccountRepositoryImpl) FindAccountByUserID(userID uint) (model.Account, 
 func (r AccountRepositoryImpl) UpdateAccount(newAccount *model.Account) (model.Account, error) {
 	result := r.db.Model(&model.Account{ID: newAccount.ID}).Updates(&newAccount)
 	if result.Error != nil {
-		log.Fatalf("error update account: %v", result.Error)
+		log.Errorf("error update account: %v", result.Error)
 		return model.Account{}, result.Error
 	}
 	return *newAccount, nil
@@ -52,7 +51,7 @@ func (r AccountRepositoryImpl) UpdateAccount(newAccount *model.Account) (model.A
 func (r AccountRepositoryImpl) DeleteAccount(account *model.Account) (bool, error) {
 	result := r.db.Delete(&account)
 	if result.Error != nil {
-		log.Fatalf("error delete account: %v", result.Error)
+		log.Errorf("error delete account: %v", result.Error)
 		return false, result.Error
 	}
 	return result.RowsAffected > 0, nil
