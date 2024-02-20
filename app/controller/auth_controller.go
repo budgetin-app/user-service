@@ -124,7 +124,8 @@ func (c AuthControllerImpl) Logout(authToken string) (bool, error) {
 
 func (c AuthControllerImpl) VerifyEmail(email string) (bool, error) {
 	// Find the email verification status
-	credential, err := c.loginInfoRepository.FindLoginInfo(&model.LoginInfo{Email: email})
+	credential := &model.LoginInfo{Email: email}
+	err := c.loginInfoRepository.FindLoginInfo(credential)
 	if err != nil {
 		log.WithError(err).Error("failed to find credential")
 		return false, err
@@ -138,7 +139,7 @@ func (c AuthControllerImpl) VerifyEmail(email string) (bool, error) {
 	resendInterval := 15 // TODO: Move the interval into service configuration
 	if !verified && credential.EmailVerification.UpdatedAt.Add(time.Duration(resendInterval)*time.Minute).Before(time.Now()) {
 		log.Debug("Send email")
-		go c.sendVerificationEmail(&credential)
+		go c.sendVerificationEmail(credential)
 	} else {
 		log.Debugf("Email already sent. Wait for %d minutes to resend", resendInterval)
 	}

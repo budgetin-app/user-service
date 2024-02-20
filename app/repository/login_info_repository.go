@@ -8,7 +8,7 @@ import (
 
 type LoginInfoRepository interface {
 	CreateLoginInfo(info *model.LoginInfo) (model.LoginInfo, error)
-	FindLoginInfo(info *model.LoginInfo) (model.LoginInfo, error)
+	FindLoginInfo(info *model.LoginInfo) error
 	UpdateLoginInfo(newInfo *model.LoginInfo) (model.LoginInfo, error)
 	DeleteLoginInfo(info *model.LoginInfo) (bool, error)
 }
@@ -36,12 +36,15 @@ func (r LoginInfoRepositoryImpl) CreateLoginInfo(info *model.LoginInfo) (model.L
 	return *info, nil
 }
 
-func (r LoginInfoRepositoryImpl) FindLoginInfo(info *model.LoginInfo) (model.LoginInfo, error) {
-	var loginInfo model.LoginInfo
-	if err := r.db.Preload("EmailVerification").Where(info).First(&loginInfo).Error; err != nil {
-		return model.LoginInfo{}, database.HandleErrorDB(err)
+func (r LoginInfoRepositoryImpl) FindLoginInfo(info *model.LoginInfo) error {
+	err := r.db.Preload("EmailVerification").
+		Preload("HashAlgorithm").
+		Where(info).
+		First(&info).Error
+	if err != nil {
+		return database.HandleErrorDB(err)
 	}
-	return loginInfo, nil
+	return nil
 }
 
 func (r LoginInfoRepositoryImpl) UpdateLoginInfo(newInfo *model.LoginInfo) (model.LoginInfo, error) {
