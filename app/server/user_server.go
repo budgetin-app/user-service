@@ -65,7 +65,7 @@ func (s *UserServerImpl) LoginUser(ctx context.Context, r *pb.AuthenticationRequ
 	}
 
 	// Begin to authenticate user
-	session, err := s.authController.Login(identifier, isEmail, r.Password)
+	session, err := s.authController.Login(isEmail, identifier, r.Password)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to login user: %v", err)
 	}

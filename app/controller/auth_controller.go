@@ -9,6 +9,7 @@ import (
 	"github.com/budgetin-app/user-service/app/constant"
 	"github.com/budgetin-app/user-service/app/domain/model"
 	"github.com/budgetin-app/user-service/app/pkg/hasher"
+	"github.com/budgetin-app/user-service/app/pkg/helper/token"
 	"github.com/budgetin-app/user-service/app/pkg/mailer"
 	"github.com/budgetin-app/user-service/app/repository"
 	"github.com/google/uuid"
@@ -17,7 +18,7 @@ import (
 
 type AuthController interface {
 	Register(username string, email string, password string) (*model.LoginInfo, error)
-	Login(identifier string, isEmail bool, password string) (model.Session, error)
+	Login(isEmail bool, identifier string, password string) (*model.Session, error)
 	Logout(authToken string) (bool, error)
 	VerifyEmail(email string) (bool, error)
 }
@@ -112,9 +113,60 @@ func (c AuthControllerImpl) Register(username string, email string, password str
 	return &credential, nil
 }
 
-func (c AuthControllerImpl) Login(identifier string, isEmail bool, password string) (model.Session, error) {
-	// TODO: Not yet implemented
-	return model.Session{}, errors.New("not yet implemented")
+func (c AuthControllerImpl) Login(isEmail bool, identifier string, password string) (*model.Session, error) {
+	// Verify user's credential
+	credential := &model.LoginInfo{}
+	if isEmail {
+		credential.Email = identifier
+	} else {
+		credential.Username = identifier
+	}
+	if err := c.loginInfoRepository.FindLoginInfo(credential); err != nil {
+		log.WithError(err).Error("failed to find credential")
+		return nil, err
+	}
+
+	// Validates user's password
+	hash := hasher.New(hasher.HashAlgorithm(credential.HashAlgorithm.Name))
+	salt, err := hex.DecodeString(credential.PasswordSalt)
+	if err != nil {
+		return nil, err
+	}
+	validPassword, err := hash.VerifyPassword(
+		[]byte(credential.PasswordHash),
+		[]byte(password),
+		salt,
+	)
+	if err != nil {
+		return nil, err
+	} else if !validPassword {
+		return nil, errors.New("password mismatched")
+	}
+
+	// Check for existing session
+	oldSession, err := c.sessionRepository.FindActiveSession(credential.ID)
+	if err != nil {
+		log.Error(err)
+	}
+	if oldSession != nil {
+		log.Debugf("found active session, id: %d", oldSession.ID)
+		return nil, errors.New("user already logged on")
+	}
+
+	// Generate session token
+	token, err := token.GenerateSessionToken()
+	if err != nil {
+		return nil, err
+	}
+
+	// Create new session for the user
+	session, err := c.sessionRepository.CreateSession(credential.ID, token)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return user session
+	return &session, nil
 }
 
 func (c AuthControllerImpl) Logout(authToken string) (bool, error) {
