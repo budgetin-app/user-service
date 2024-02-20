@@ -14,18 +14,20 @@ var roleIds = []uint{UserRoleID, AdminRoleID}
 var roleNames = []string{"User", "Admin"}
 
 // GetUserRoleNameByID get the name of the user role by it's id
-func GetUserRoleNameByID(id uint) string {
+func GetUserRoleNameByID(id uint) (*string, error) {
 	if int(id) <= len(roleNames) {
-		return roleNames[id-1]
+		return &roleNames[id-1], nil
 	} else {
-		panic(fmt.Sprintf("user role is not within the range, id '%d'", id))
+		return nil, fmt.Errorf("user role with id %d not found", id)
 	}
 }
 
 func GetUserRoles() map[uint]string {
 	list := make(map[uint]string, len(roleIds))
 	for _, id := range roleIds {
-		list[id] = GetUserRoleNameByID(id)
+		if role, err := GetUserRoleNameByID(id); err == nil {
+			list[id] = *role
+		}
 	}
 	return list
 }

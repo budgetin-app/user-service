@@ -3,6 +3,7 @@ package database
 import (
 	"github.com/budgetin-app/user-service/app/constant"
 	"github.com/budgetin-app/user-service/app/domain/model"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -12,7 +13,7 @@ func SeederDB(db *gorm.DB) {
 	// Seed roles
 	for roleID, roleName := range constant.GetUserRoles() {
 		if err := db.Save(&model.Role{ID: roleID, Name: roleName}).Error; err != nil {
-			panic("failed to seed roles")
+			log.Panicf("failed to seed roles: %v", err)
 		}
 	}
 

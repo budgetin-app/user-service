@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -120,7 +121,8 @@ func GenerateRandomSalts(size int) []byte {
 
 	salt := make([]byte, size)
 	if _, err := rand.Read(salt[:]); err != nil {
-		panic(err)
+		log.Errorf("failed to generate random salt with size %d", size)
+		return nil
 	}
 
 	return salt
