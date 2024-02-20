@@ -1,6 +1,7 @@
 package hasher_test
 
 import (
+	"encoding/hex"
 	"testing"
 
 	"github.com/budgetin-app/user-service/app/pkg/hasher"
@@ -271,5 +272,31 @@ func TestGenerateHashPasswordAndVerifyPasswordEmptyHashedPasswordAndMismatchedAl
 
 	if match {
 		t.Error("VerifyPassword unexpectedly succeeded with empty hashed password and mismatched algorithm")
+	}
+}
+
+func TestVerifyPasswordStoredInDatabase(t *testing.T) {
+	// Value in database found according to the specified user:
+	// - hashedPassword: bcrypt$2a$10$AsYbsxQFNFvhsINCe.lF4.tbOaE2wuqhwfNJ9gICYFlcaFpq0ZrMS
+	// - password: password@123
+	// - salt: 933c48ba9868b52020bf3c7eddd91c25
+	hashedPassword := []byte("bcrypt$2a$10$AsYbsxQFNFvhsINCe.lF4.tbOaE2wuqhwfNJ9gICYFlcaFpq0ZrMS")
+	password := []byte("password@123")
+
+	// Password stored in database should be decoded
+	salt, err := hex.DecodeString("933c48ba9868b52020bf3c7eddd91c25")
+
+	if err != nil {
+		t.Errorf("VerifyPassword failed decode salt: %v", err)
+	}
+
+	hash := hasher.New(hasher.HashAlgorithm("bcrypt"))
+
+	match, err := hash.VerifyPassword(hashedPassword, password, salt)
+	if err != nil {
+		t.Error("VerifyPassword unexpected error")
+	}
+	if !match {
+		t.Error("VerifyPassword password verification failed")
 	}
 }

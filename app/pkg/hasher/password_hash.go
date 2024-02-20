@@ -13,7 +13,7 @@ import (
 // PasswordHasher is the interface for password hasing
 type PasswordHasher interface {
 	GenerateHashPassword(password []byte, salt []byte) ([]byte, error)
-	VerifyPassword(hashedPassword []byte, password []byte, salt []byte) error
+	VerifyPassword(hashedPassword []byte, password []byte, salt []byte) (bool, error)
 }
 
 // PasswordHasher is the implementation of the PasswordHasher interface
