@@ -1,10 +1,11 @@
 package repository
 
 import (
-	"log"
+	"errors"
 	"time"
 
 	"github.com/budgetin-app/user-service/app/domain/model"
+	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -12,7 +13,7 @@ type SessionRepository interface {
 	CreateSession(userID uint, token string) (model.Session, error)
 	FindActiveSession(userID uint) (*model.Session, error)
 	UpdateSessionStatus(sessionID uint, status string) (bool, error)
-	DeleteSession(session *model.Session) (bool, error)
+	DeleteSessionByToken(authToken string) error
 }
 
 type SessionRepositoryImpl struct {
@@ -56,11 +57,17 @@ func (r SessionRepositoryImpl) UpdateSessionStatus(sessionID uint, status string
 	return result.RowsAffected > 0, nil
 }
 
-func (r SessionRepositoryImpl) DeleteSession(session *model.Session) (bool, error) {
-	result := r.db.Delete(&session)
+func (r SessionRepositoryImpl) DeleteSessionByToken(authToken string) error {
+	result := r.db.Where("session_token = ?", authToken).Delete(&model.Session{})
 	if result.Error != nil {
 		log.Fatalf("error delete session: %v", result.Error)
-		return false, result.Error
+		return result.Error
 	}
-	return result.RowsAffected > 0, nil
+
+	log.Debugf("session deleted count: %d", result.RowsAffected)
+	if result.RowsAffected <= 0 {
+		return errors.New("no session deleted")
+	}
+
+	return nil
 }

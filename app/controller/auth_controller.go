@@ -170,8 +170,11 @@ func (c AuthControllerImpl) Login(isEmail bool, identifier string, password stri
 }
 
 func (c AuthControllerImpl) Logout(authToken string) (bool, error) {
-	// TODO: Not yet implemented
-	return false, errors.New("not yet implemented")
+	// Delete the session
+	if err := c.sessionRepository.DeleteSessionByToken(authToken); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (c AuthControllerImpl) VerifyEmail(email string) (bool, error) {
